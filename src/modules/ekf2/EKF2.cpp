@@ -1684,6 +1684,9 @@ int EKF2::task_spawn(int argc, char *argv[])
 	int32_t sens_imu_mode = 1;
 	param_get(param_find("SENS_IMU_MODE"), &sens_imu_mode);
 
+	int32_t hitl_mode = 0;
+	param_get(param_find("SYS_HITL"), &hitl_mode);
+
 	if (sens_imu_mode == 0) {
 		// ekf selector requires SENS_IMU_MODE = 0
 		multi_mode = true;
@@ -1742,7 +1745,7 @@ int EKF2::task_spawn(int argc, char *argv[])
 
 		while ((multi_instances_allocated < multi_instances)
 		       && (vehicle_status_sub.get().arming_state != vehicle_status_s::ARMING_STATE_ARMED)
-		       && (hrt_elapsed_time(&time_started) < 30_s)) {
+		       && ((hrt_elapsed_time(&time_started) < 30_s || hitl_mode == 1))) {
 
 			vehicle_status_sub.update();
 
